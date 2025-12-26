@@ -12,7 +12,13 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin
 
 from .__version__ import __version__
-from .cffi import addCookiesToSession, destroySession, freeMemory, getCookiesFromSession, request
+from .cffi import (
+    addCookiesToSession,
+    destroySession,
+    freeMemory,
+    getCookiesFromSession,
+    request,
+)
 from .cookies import cookiejar_from_dict, extract_cookies_to_jar, merge_cookies
 from .exceptions import TLSClientExeption
 from .response import Response, build_response
@@ -60,7 +66,7 @@ class SteamThread(threading.Thread):
         print(f"An error occurred: {error}")
 
     def _remove_file(self) -> None:
-        filepath = getattr(self.main_request, '_filepath', None)
+        filepath = getattr(self.main_request, "_filepath", None)
         if filepath and os.path.exists(filepath):
             try:
                 os.remove(filepath)
@@ -69,32 +75,33 @@ class SteamThread(threading.Thread):
 
 
 class Session:
-    def __init__(self,
-                 client_identifier: ClientIdentifiers = "chrome_124",
-                 ja3_string: Optional[str] = None,
-                 h2_settings: Optional[Dict[str, int]] = None,
-                 h2_settings_order: Optional[List[str]] = None,
-                 supported_signature_algorithms: Optional[List[str]] = None,
-                 supported_delegated_credentials_algorithms: Optional[List[str]] = None,
-                 supported_versions: Optional[List[str]] = None,
-                 key_share_curves: Optional[List[str]] = None,
-                 cert_compression_algo: str = None,
-                 additional_decode: str = None,
-                 pseudo_header_order: Optional[List[str]] = None,
-                 connection_flow: Optional[int] = None,
-                 priority_frames: Optional[list] = None,
-                 header_order: Optional[List[str]] = None,
-                 header_priority: Optional[List[str]] = None,
-                 random_tls_extension_order: bool = False,
-                 force_http1: bool = False,
-                 disable_http3: bool = False,
-                 catch_panics: bool = False,
-                 debug: bool = False,
-                 certificate_pinning: Optional[Dict[str, List[str]]] = None,
-                 disable_ipv6: bool = False,
-                 disable_ipv4: bool = False,
-                 disable_compression: bool = False,
-                 ) -> None:
+    def __init__(
+        self,
+        client_identifier: ClientIdentifiers = "chrome_124",
+        ja3_string: Optional[str] = None,
+        h2_settings: Optional[Dict[str, int]] = None,
+        h2_settings_order: Optional[List[str]] = None,
+        supported_signature_algorithms: Optional[List[str]] = None,
+        supported_delegated_credentials_algorithms: Optional[List[str]] = None,
+        supported_versions: Optional[List[str]] = None,
+        key_share_curves: Optional[List[str]] = None,
+        cert_compression_algo: str = None,
+        additional_decode: str = None,
+        pseudo_header_order: Optional[List[str]] = None,
+        connection_flow: Optional[int] = None,
+        priority_frames: Optional[list] = None,
+        header_order: Optional[List[str]] = None,
+        header_priority: Optional[List[str]] = None,
+        random_tls_extension_order: bool = False,
+        force_http1: bool = False,
+        disable_http3: bool = False,
+        catch_panics: bool = False,
+        debug: bool = False,
+        certificate_pinning: Optional[Dict[str, List[str]]] = None,
+        disable_ipv6: bool = False,
+        disable_ipv4: bool = False,
+        disable_compression: bool = False,
+    ) -> None:
 
         self.MAX_REDIRECTS: int = 30
 
@@ -354,15 +361,13 @@ class Session:
         self.close()
 
     def close(self) -> str:
-        destroy_session_payload = {
-            "sessionId": self._session_id
-        }
+        destroy_session_payload = {"sessionId": self._session_id}
 
-        destroy_session_response = destroySession(dumps(destroy_session_payload).encode('utf-8'))
+        destroy_session_response = destroySession(dumps(destroy_session_payload).encode("utf-8"))
         destroy_session_response_bytes = ctypes.string_at(destroy_session_response)
-        destroy_session_response_string = destroy_session_response_bytes.decode('utf-8')
+        destroy_session_response_string = destroy_session_response_bytes.decode("utf-8")
         destroy_session_response_object = loads(destroy_session_response_string)
-        freeMemory(destroy_session_response_object['id'].encode('utf-8'))
+        freeMemory(destroy_session_response_object["id"].encode("utf-8"))
         # todo add exception if success is False
         return destroy_session_response_string
 
@@ -371,12 +376,12 @@ class Session:
             "sessionId": self._session_id,
             "url": url,
         }
-        cookie_response = getCookiesFromSession(dumps(cookie_payload).encode('utf-8'))
+        cookie_response = getCookiesFromSession(dumps(cookie_payload).encode("utf-8"))
         cookie_response_bytes = ctypes.string_at(cookie_response)
-        cookie_response_string = cookie_response_bytes.decode('utf-8')
+        cookie_response_string = cookie_response_bytes.decode("utf-8")
         cookie_response_object = loads(cookie_response_string)
 
-        freeMemory(cookie_response_object['id'].encode('utf-8'))
+        freeMemory(cookie_response_object["id"].encode("utf-8"))
         if cookie_response_object.get("status") == 0:
             raise TLSClientExeption(cookie_response_object["body"])
 
@@ -390,12 +395,12 @@ class Session:
             "url": url,
         }
         # todo add exception, no session
-        add_cookies_to_session_response = addCookiesToSession(dumps(cookies_payload).encode('utf-8'))
+        add_cookies_to_session_response = addCookiesToSession(dumps(cookies_payload).encode("utf-8"))
         add_cookies_bytes = ctypes.string_at(add_cookies_to_session_response)
-        add_cookies_string = add_cookies_bytes.decode('utf-8')
+        add_cookies_string = add_cookies_bytes.decode("utf-8")
         add_cookies_object = loads(add_cookies_string)
 
-        freeMemory(add_cookies_object['id'].encode('utf-8'))
+        freeMemory(add_cookies_object["id"].encode("utf-8"))
         if add_cookies_object.get("status") == 0:
             raise TLSClientExeption(add_cookies_object["body"])
 
@@ -406,9 +411,9 @@ class Session:
         return url
 
     @staticmethod
-    def _prepare_request_body(data: Optional[Union[str, dict]] = None,
-                              json: Optional[Dict] = None
-                              ) -> Tuple[Optional[str], Optional[str]]:
+    def _prepare_request_body(
+        data: Optional[Union[str, dict]] = None, json: Optional[Dict] = None
+    ) -> Tuple[Optional[str], Optional[str]]:
         if data is None and json is not None:
             if type(json) in [dict, list]:
                 json = dumps(json)
@@ -432,11 +437,11 @@ class Session:
         cookies = merge_cookies(self.cookies, cookies)
         return [
             {
-                'domain': c.domain,
-                'expires': c.expires,
-                'name': c.name,
-                'path': c.path,
-                'value': c.value.replace('"', "")
+                "domain": c.domain,
+                "expires": c.expires,
+                "name": c.name,
+                "path": c.path,
+                "value": c.value.replace('"', ""),
             }
             for c in cookies
         ]
@@ -451,20 +456,21 @@ class Session:
         else:
             return ""
 
-    def _build_request_payload(self,
-                               method: str,
-                               url: str,
-                               headers: CaseInsensitiveDict,
-                               request_body: Optional[Union[str, bytes, bytearray]],
-                               request_cookies: List[Dict],
-                               is_byte_request: bool,
-                               timeout: int,
-                               proxy: str,
-                               verify: bool,
-                               stream: bool,
-                               chunk_size: int,
-                               certificate_pinning: Optional[Dict[str, List[str]]] = None
-                               ) -> dict:
+    def _build_request_payload(
+        self,
+        method: str,
+        url: str,
+        headers: CaseInsensitiveDict,
+        request_body: Optional[Union[str, bytes, bytearray]],
+        request_cookies: List[Dict],
+        is_byte_request: bool,
+        timeout: int,
+        proxy: str,
+        verify: bool,
+        stream: bool,
+        chunk_size: int,
+        certificate_pinning: Optional[Dict[str, List[str]]] = None,
+    ) -> dict:
 
         # https://bogdanfinn.gitbook.io/open-source-oasis/shared-library/payload
         request_payload = {
@@ -502,6 +508,7 @@ class Session:
             "withDebug": self.debug,
             "withDefaultCookieJar": False,
             "withoutCookieJar": False,
+            "withCustomCookieJar": True,
             # "withRandomTLSExtensionOrder": False,
         }
 
@@ -512,9 +519,7 @@ class Session:
             request_payload["certificatePinningHosts"] = certificate_pinning
 
         if self.disable_compression:
-            request_payload["transportOptions"] = {
-                "disableCompression": self.disable_compression
-            }
+            request_payload["transportOptions"] = {"disableCompression": self.disable_compression}
             request_payload["headers"].update({"Accept-Encoding": None})
 
         # todo implement the following settings
@@ -557,21 +562,21 @@ class Session:
         return request_payload
 
     def execute_request(
-            self,
-            method: str,
-            url: str,
-            params: Optional[Dict] = None,
-            data: Optional[Union[str, dict]] = None,
-            headers: Optional[Dict] = None,
-            cookies: Optional[Dict] = None,
-            json: Optional[Dict] = None,
-            allow_redirects: Optional[bool] = True,
-            verify: Optional[bool] = True,
-            timeout: Optional[int] = None,
-            proxy: Optional[Dict] = None,
-            proxies: Optional[Dict] = None,
-            stream: Optional[bool] = False,
-            chunk_size: Optional[int] = 1024,
+        self,
+        method: str,
+        url: str,
+        params: Optional[Dict] = None,
+        data: Optional[Union[str, dict]] = None,
+        headers: Optional[Dict] = None,
+        cookies: Optional[Dict] = None,
+        json: Optional[Dict] = None,
+        allow_redirects: Optional[bool] = True,
+        verify: Optional[bool] = True,
+        timeout: Optional[int] = None,
+        proxy: Optional[Dict] = None,
+        proxies: Optional[Dict] = None,
+        stream: Optional[bool] = False,
+        chunk_size: Optional[int] = 1024,
     ) -> Response:
 
         url = self._prepare_url(url, params)
@@ -608,15 +613,15 @@ class Session:
                 verify=verify,
                 stream=stream,
                 chunk_size=chunk_size,
-                certificate_pinning=certificate_pinning
+                certificate_pinning=certificate_pinning,
             )
 
             # Execute the request using the TLS client
-            response = request(dumps(request_payload).encode('utf-8'))
+            response = request(dumps(request_payload).encode("utf-8"))
             response_bytes = ctypes.string_at(response)
-            response_string = response_bytes.decode('utf-8')
+            response_string = response_bytes.decode("utf-8")
             response_object = loads(response_string)
-            freeMemory(response_object['id'].encode('utf-8'))
+            freeMemory(response_object["id"].encode("utf-8"))
 
             # todo update for each Response
             elapsed = preferred_clock() - start
@@ -629,7 +634,7 @@ class Session:
                 request_url=url,
                 request_headers=headers,
                 cookie_jar=self.cookies,
-                response_headers=response_object["headers"]
+                response_headers=response_object["headers"],
             )
 
             if stream:
@@ -686,11 +691,7 @@ class Session:
         if kwargs.get("stream", False):
             head_data = self.head(url, **kwargs)
             stream_data_thread = SteamThread(
-                main_request=head_data,
-                target=self.execute_request,
-                method="GET",
-                url=url,
-                **kwargs
+                main_request=head_data, target=self.execute_request, method="GET", url=url, **kwargs
             )
 
             stream_data_thread.start()
@@ -706,7 +707,9 @@ class Session:
         kwargs.setdefault("allow_redirects", False)
         return self.execute_request(method="HEAD", url=url, **kwargs)
 
-    def post(self, url: str, data: Optional[Union[str, dict]] = None, json: Optional[dict] = None, **kwargs: Any) -> Response:
+    def post(
+        self, url: str, data: Optional[Union[str, dict]] = None, json: Optional[dict] = None, **kwargs: Any
+    ) -> Response:
         """Sends a POST request"""
         if kwargs.get("stream", False):
             # todo head for post request doesn't always work correctly
@@ -718,18 +721,22 @@ class Session:
                 url=url,
                 data=data,
                 json=json,
-                **kwargs
+                **kwargs,
             )
 
             stream_data_thread.start()
             return head_data
         return self.execute_request(method="POST", url=url, data=data, json=json, **kwargs)
 
-    def put(self, url: str, data: Optional[Union[str, dict]] = None, json: Optional[dict] = None, **kwargs: Any) -> Response:
+    def put(
+        self, url: str, data: Optional[Union[str, dict]] = None, json: Optional[dict] = None, **kwargs: Any
+    ) -> Response:
         """Sends a PUT request"""
         return self.execute_request(method="PUT", url=url, data=data, json=json, **kwargs)
 
-    def patch(self, url: str, data: Optional[Union[str, dict]] = None, json: Optional[dict] = None, **kwargs: Any) -> Response:
+    def patch(
+        self, url: str, data: Optional[Union[str, dict]] = None, json: Optional[dict] = None, **kwargs: Any
+    ) -> Response:
         """Sends a PATCH request"""
         return self.execute_request(method="PATCH", url=url, data=data, json=json, **kwargs)
 
