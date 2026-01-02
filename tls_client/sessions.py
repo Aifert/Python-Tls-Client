@@ -20,7 +20,7 @@ from .cffi import (
     request,
 )
 from .cookies import cookiejar_from_dict, extract_cookies_to_jar, merge_cookies
-from .exceptions import TLSClientExeption
+from .exceptions import TLSClientException
 from .response import Response, build_response
 from .settings import ClientIdentifiers
 from .structures import CaseInsensitiveDict
@@ -383,7 +383,7 @@ class Session:
 
         freeMemory(cookie_response_object["id"].encode("utf-8"))
         if cookie_response_object.get("status") == 0:
-            raise TLSClientExeption(cookie_response_object["body"])
+            raise TLSClientException(cookie_response_object["body"])
 
         return cookie_response_object["cookies"]
 
@@ -402,7 +402,7 @@ class Session:
 
         freeMemory(add_cookies_object["id"].encode("utf-8"))
         if add_cookies_object.get("status") == 0:
-            raise TLSClientExeption(add_cookies_object["body"])
+            raise TLSClientException(add_cookies_object["body"])
 
     @staticmethod
     def _prepare_url(url: str, params: Optional[Dict] = None) -> str:
@@ -628,7 +628,7 @@ class Session:
 
             # Handle response, split up into new method?
             if response_object["status"] == 0:
-                raise TLSClientExeption(response_object["body"])
+                raise TLSClientException(response_object["body"])
 
             response_cookie_jar = extract_cookies_to_jar(
                 request_url=url,
@@ -652,7 +652,7 @@ class Session:
             redirect += 1
 
             if redirect > self.MAX_REDIRECTS:
-                raise TLSClientExeption(f"Max redirects ({self.MAX_REDIRECTS}) exceeded")
+                raise TLSClientException(f"Max redirects ({self.MAX_REDIRECTS}) exceeded")
 
             url = self._rebuild_url(url, response)
             method = self._rebuild_methods(method, response)
