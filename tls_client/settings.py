@@ -23,6 +23,8 @@ ClientIdentifiers: TypeAlias = Literal[
     "chrome_131_PSK",
     "chrome_133",
     "chrome_133_PSK",
+    "chrome_144",
+    "chrome_144_PSK",
     # Safari
     "safari_15_6_1",
     "safari_16_0",
@@ -49,6 +51,9 @@ ClientIdentifiers: TypeAlias = Literal[
     "firefox_132",
     "firefox_133",
     "firefox_135",
+    "firefox_146_PSK",
+    "firefox_147",
+    "firefox_147_PSK",
     # Opera
     "opera_89",
     "opera_90",
