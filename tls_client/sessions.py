@@ -506,7 +506,7 @@ class Session:
             "timeoutSeconds": timeout,
             # "tlsClientIdentifier": "",
             "withDebug": self.debug,
-            "withDefaultCookieJar": False,
+            "withCustomCookieJar": False,
             "withoutCookieJar": False,
             "withCustomCookieJar": True,
             # "withRandomTLSExtensionOrder": False,
@@ -644,7 +644,7 @@ class Session:
                 response = build_response(response_object, response_cookie_jar, request_payload)
             response.elapsed = timedelta(seconds=elapsed)
 
-            response.history = history
+            response.history = history.copy()
             if not allow_redirects or not response.is_redirect:
                 return response
 
